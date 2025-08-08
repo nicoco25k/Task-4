@@ -46,7 +46,7 @@ jobs:
       # 5. Mensaje si falla la validación
       - name: Validation Failed
         if: failure()
-        run: echo "Error: El HTML tiene problemas. Corrige antes de desplegar."
+        run: echo "Error, El HTML tiene problemas. Corrige antes de desplegar."
 
       # 6. Configurar GitHub Pages (solo si pasó la validación)
       - name: Setup Pages
