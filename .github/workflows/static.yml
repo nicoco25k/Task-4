@@ -1,10 +1,10 @@
-# Simple workflow for deploying static content to Pages
-name: Deploy static content to Pages with Validation
+# Workflow para validar HTML y desplegar en GitHub Pages
+name: Validate HTML and Deploy
 
 on:
   push:
-    branches: ["main"]
-  workflow_dispatch:
+    branches: ["main"] # Ejecutar cuando se haga push a main
+  workflow_dispatch:   # Permite ejecutarlo manualmente
 
 permissions:
   contents: read
@@ -16,50 +16,52 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  validate-and-deploy:
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
 
     steps:
-      # 1. Descargar el código
+      # 1. Descargar el repositorio
       - name: Checkout
         uses: actions/checkout@v4
 
       # 2. Instalar validador HTML
-      - name: Install HTML Validator
-        run: |
-          npm install -g htmlhint
+      - name: Install HTMLHint
+        run: npm install -g htmlhint
 
       # 3. Validar HTML
       - name: Validate HTML
         id: validate
         run: |
-          echo "Validating HTML..."
+          echo "🔍 Validando HTML..."
           htmlhint index.html
-          
-      # 4. Mensaje si pasó la validación
-      - name: Success Message
+
+      # 4. Mensaje si pasa la validación
+      - name: Validation Success
         if: success()
-        run: echo "El HTML está correcto. Continuando con el despliegue."
+        run: echo "HTML válido. Continuando con el despliegue..."
 
-      # 5. Mensaje si falló la validación
-      - name: Error Message
+      # 5. Mensaje si falla la validación
+      - name: Validation Failed
         if: failure()
-        run: echo "El HTML tiene errores. Revisa antes de desplegar."
+        run: echo "Error: El HTML tiene problemas. Corrige antes de desplegar."
 
-      # 6. Configuración de GitHub Pages
+      # 6. Configurar GitHub Pages (solo si pasó la validación)
       - name: Setup Pages
+        if: success()
         uses: actions/configure-pages@v5
 
-      # 7. Subir los archivos para desplegar
+      # 7. Subir archivos a GitHub Pages
       - name: Upload artifact
+        if: success()
         uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
 
-      # 8. Desplegar a GitHub Pages
+      # 8. Desplegar
       - name: Deploy to GitHub Pages
+        if: success()
         id: deployment
         uses: actions/deploy-pages@v4
