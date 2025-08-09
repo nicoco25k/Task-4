@@ -35,7 +35,7 @@ jobs:
       - name: Validate HTML
         id: validate
         run: |
-          echo "🔍 Validando HTML..."
+          echo "Validando HTML..."
           htmlhint index.html
 
       # 4. Mensaje si pasa la validación
